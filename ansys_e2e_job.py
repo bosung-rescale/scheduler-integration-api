@@ -510,6 +510,7 @@ if __name__ == '__main__':
             job_url_filename = job_name+".url"
             job_url_file = open(job_url_filename, 'w')
             url = 'URL='+rescale_platform+'/jobs/'+job_id+'/runs/1/results/'
+            url = '[InternetShortcut]\n'+url
         else:
             job_url_filename = job_name+".desktop"
             job_url_file = open(job_url_filename, 'w')
