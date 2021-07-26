@@ -167,7 +167,7 @@ def dcv_info(job_name) :
 
     #print(instance_info_dict)
     #print(dcv_pass_dict)
-
+    time.sleep(120)
     dcv_connection_filename = job_name+".dcv"
     dcv_connection_file = open(dcv_connection_filename, 'w')
 
