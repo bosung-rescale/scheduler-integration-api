@@ -468,10 +468,8 @@ if __name__ == '__main__':
                         'walltime' : wtime,
                         'coreType' : coretype_code,
                         #'type' : 'interactive',
-                        },
-                        'data' : { 
-                            'waiveSla' : True
-                        },  
+                    },
+#                    'data' : { 'waiveSla' : True },  
                     'inputFiles' : inputfiles_list
                 },
             ] 
@@ -488,14 +486,17 @@ if __name__ == '__main__':
     job_setup_dict = json.loads(job_setup.text)
     job_id = job_setup_dict['id'].strip()
 
-    #print(json.dumps(job_setup_dict, indent=2, separators=(',',': ')))
-
+#    print(json.dumps(job_setup_dict, indent=2, separators=(',',': ')))
+    
 # Submit Job
     job_submit_url = rescale_platform + '/api/v2/jobs/' + job_id + '/submit/'
+
     submit_job = requests.post(
         job_submit_url,
-        headers={'Authorization': my_token} 
+        json={'waiveSla' : True},
+        headers={'Authorization': my_token},
     )
+
     if (submit_job.status_code == 200) :
         print ('Job ' + job_id + ' : submitted')
         job_info_filename = job_name+".job"

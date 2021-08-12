@@ -467,9 +467,9 @@ if __name__ == '__main__':
                         'coreType' : coretype_code,
                         #'type' : 'interactive',
                         },
-                        'data' : { 
-                            'waiveSla' : True
-                        },  
+#                        'data' : { 
+#                            'waiveSla' : True
+#                        },  
                     'inputFiles' : inputfiles_list
                 },
             ] 
@@ -492,6 +492,7 @@ if __name__ == '__main__':
     job_submit_url = rescale_platform + '/api/v2/jobs/' + job_id + '/submit/'
     submit_job = requests.post(
         job_submit_url,
+        json={'waiveSla' : True},
         headers={'Authorization': my_token} 
     )
     if (submit_job.status_code == 200) :
