@@ -1,6 +1,12 @@
 2021/0812
 - {waiveSla: True} location changed from job setup to job submission
 
+ job_submit_url = rescale_platform + '/api/v2/jobs/' + job_id + '/submit/'
+    submit_job = requests.post(
+        job_submit_url,
+        json={'waiveSla' : True},
+        headers={'Authorization': my_token},
+
 2021/07/22
 - Add the Result file path
 - Remove license_info
