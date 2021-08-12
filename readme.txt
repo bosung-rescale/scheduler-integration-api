@@ -1,3 +1,6 @@
+2021/0812
+- {waiveSla: True} location changed from job setup to job submission
+
 2021/07/22
 - Add the Result file path
 - Remove license_info
