@@ -1,4 +1,8 @@
-2021/0812
+2021/08/13
+Multipart upload is applied for large input file upload
+
+
+2021/08/12
 - {waiveSla: True} location changed from job setup to job submission
 
  job_submit_url = rescale_platform + '/api/v2/jobs/' + job_id + '/submit/'
