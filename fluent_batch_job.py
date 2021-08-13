@@ -10,6 +10,7 @@ import getpass
 import argparse
 import signal
 import platform
+from requests_toolbelt import MultipartEncoder, MultipartEncoderMonitor
 
 def download_files() :
     global rescale_platform
@@ -373,20 +374,31 @@ if __name__ == '__main__':
 
     for i in range(len(input_files)) :
         try:
-            upload_file = requests.post(
-                upload_url,
-                headers={'Authorization' : my_token},
-                files={'file': open(input_files[i], 'rb')}
-            )
-            if (upload_file.status_code == 201) :
-                print('Input file ' + input_files[i] + ' uploaded')
-                uploaded_files = uploaded_files + ' ' + os.path.basename(input_files[i])
-                upload_file_dict = json.loads(upload_file.text)
-                inputfile_id[i] = upload_file_dict['id']
-                inputfiles_list.append({'id':inputfile_id[i],'decompress':False}) # Don't decompress cas.gz, dat.gz
-            else:
-                print('Input file ' + input_files[i] + ' upload failed')
-                exit(1)
+            with open(input_files[i], 'rb') as ifile:
+                def cb_print_status(monitor):
+                    sys.stdout.write('\r'+input_files[i]+' {:.2f}% uploaded ({} of {} bytes)'.format(
+                        100.0 * monitor.bytes_read / monitor.len, monitor.bytes_read, monitor.len))
+                    sys.stdout.flush()
+
+                encoder = MultipartEncoder(fields={'file': (ifile.name, ifile)})
+                monitor = MultipartEncoderMonitor(encoder, cb_print_status)
+
+                upload_file = requests.post(
+                    upload_url,
+                    data=monitor,
+                    headers={'Authorization' : my_token,'Content-Type': encoder.content_type})
+
+                if (upload_file.status_code == 201) :
+#                    print('\nInput file ' + input_files[i] + ' uploaded')
+                    uploaded_files = uploaded_files + ' ' + os.path.basename(input_files[i])
+                    upload_file_dict = json.loads(upload_file.text)
+                    inputfile_id[i] = upload_file_dict['id']
+                    inputfiles_list.append({'id':inputfile_id[i],'decompress':False})
+                else:
+                    print('\nInput file ' + input_files[i] + ' upload failed')
+                    exit(1)
+
+                print('\n')
 
         except FileNotFoundError as e:
             print (e) 
