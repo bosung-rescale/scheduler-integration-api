@@ -416,7 +416,7 @@ if __name__ == '__main__':
         command = 'cfx5solve -def ' + def_file + ' -part ' + str(num_of_cores) + ' '+ cfx_option + ' \n'
     else :
 #        command = 'cfx5solve -def ' + def_file + ' -part ' + str(core_per_slot) + ' -initial-file ' + res_file + ' ' + cfx_option + ' \n'
-        command = 'cfx5solve -def ' + def_file + ' -part ' + str(num_of_cores) + ' -initial-file ' + res_file + ' ' + cfx_option + ' \n'
+        command = 'cfx5solve -def ' + def_file + ' -part ' + str(num_of_cores) + ' -ini ' + res_file + ' ' + cfx_option + ' \n'
 
     rm_command = 'rm -f '+ uploaded_files + '\n'
 #    zip_command = 'zip -r -q ' + job_name + '_out.zip * -x process_output.log -x tmp/* \n' 
