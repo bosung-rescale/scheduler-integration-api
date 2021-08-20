@@ -1,3 +1,7 @@
+2021/p8/20
+modify cfx5solve restart option : '-initial-file' -> '-ini'
+'-initial-file' option is used for restoring the previous run. therefore, if the absolute path of .res file is defined in the .def file, the 'file not found' error occurs. '-ini' option reads the .res file in the working directory.
+
 2021/08/13
 Multipart upload is applied for large input file upload
 
