@@ -1,4 +1,13 @@
-2021/p8/20
+2021/08/30
+- Add the -otherfile option for uploading addition files with input files
+- Add commands for handling the absolute CFX restart file path in the .def file
+   example) 
+       cfx5cmds -read -def SSJ_HP.def -text SSJ_HP.def.ccl 
+       sed -i "s/=.*.SSJ_HP_007.res/= SSJ_HP_007.res/" SSJ_HP.def.ccl  
+       cfx5cmds -write -def SSJ_HP.def -text SSJ_HP.def.ccl 
+- Checkpoint (E2E) is added in cfx_e2e_job.py & ansys_e2e_job.py
+
+2021/08/20
 modify cfx5solve restart option : '-initial-file' -> '-ini'
 '-initial-file' option is used for restoring the previous run. therefore, if the absolute path of .res file is defined in the .def file, the 'file not found' error occurs. '-ini' option reads the .res file in the working directory.
 
