@@ -298,6 +298,7 @@ if __name__ == '__main__':
     parser.add_argument('--option', '-o', required=False, default='', help='Fluent Option')
     parser.add_argument('--inputs', '-i', required=True, help='Input File Name')
     parser.add_argument('--journal', '-j', required=True, help='Journal File')
+    parser.add_argument('--otherfiles', '-of', required=False, help='Other File Names')
     parser.add_argument('--wtime', '-w', required=True, help='Max. Wall Time')
 
     args = parser.parse_args()
@@ -336,6 +337,7 @@ if __name__ == '__main__':
     fluent_option = args.option
     input_file = args.inputs
     journal_file = args.journal
+    other_file = args.otherfiles
     wtime = int(args.wtime)
     coretype_name = args.coretype
 
@@ -371,17 +373,21 @@ if __name__ == '__main__':
     uploaded_files = ''
 
     input_files.append(journal_file)
+    other_files = other_file.split()
+    for i in range(len(other_files)):
+        input_files.append(other_files[i])
 
     for i in range(len(input_files)) :
         try:
             with open(input_files[i], 'rb') as ifile:
-                def cb_print_status(monitor):
-                    sys.stdout.write('\r'+input_files[i]+' {:.2f}% uploaded ({} of {} bytes)'.format(
-                        100.0 * monitor.bytes_read / monitor.len, monitor.bytes_read, monitor.len))
-                    sys.stdout.flush()
+#                def cb_print_status(monitor):
+#                    sys.stdout.write('\r'+input_files[i]+' {:.2f}% uploaded ({} of {} bytes)'.format(
+#                        100.0 * monitor.bytes_read / monitor.len, monitor.bytes_read, monitor.len))
+#                    sys.stdout.flush()
 
                 encoder = MultipartEncoder(fields={'file': (ifile.name, ifile)})
-                monitor = MultipartEncoderMonitor(encoder, cb_print_status)
+#                monitor = MultipartEncoderMonitor(encoder, cb_print_status)
+                monitor = MultipartEncoderMonitor(encoder)
 
                 upload_file = requests.post(
                     upload_url,
@@ -389,16 +395,14 @@ if __name__ == '__main__':
                     headers={'Authorization' : my_token,'Content-Type': encoder.content_type})
 
                 if (upload_file.status_code == 201) :
-#                    print('\nInput file ' + input_files[i] + ' uploaded')
+                    print('- ' + input_files[i] + ' uploaded')
                     uploaded_files = uploaded_files + ' ' + os.path.basename(input_files[i])
                     upload_file_dict = json.loads(upload_file.text)
                     inputfile_id[i] = upload_file_dict['id']
                     inputfiles_list.append({'id':inputfile_id[i],'decompress':False})
                 else:
-                    print('\nInput file ' + input_files[i] + ' upload failed')
+                    print('- ' + input_files[i] + ' upload failed')
                     exit(1)
-
-                print('\n')
 
         except FileNotFoundError as e:
             print (e) 
@@ -416,9 +420,10 @@ if __name__ == '__main__':
     zip_command = ''
     job_command = command + rm_command + zip_command
 
-    print('Job Information')
+    print('\nJob Information')
     print('- input_file : ' + input_file)
     print('- journal_file : ' + journal_file)
+    print('- other_file : ' + other_file)
     print('- code_name : ' + code_name)
     print('- version_code : ' + version_code)
     print('- coretype_name : ' + coretype_name)
