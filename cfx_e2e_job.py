@@ -297,6 +297,7 @@ if __name__ == '__main__':
                          16.2.1 / 16.2 / 18.2 / 19.0 / 19.1 / 19.2 / 2019r1 / 2019r2 / 2019r3 / 2020r1 / 2020r2 / 2021r1')
     parser.add_argument('--option', '-o', required=False, default='', help='CFX Option')
     parser.add_argument('--inputs', '-i', required=True, help='Input File Name')
+    parser.add_argument('--otherfiles', '-of', required=False, help='Other File Names')
     parser.add_argument('--wtime', '-w', required=True, help='Max. Wall Time')
 
     args = parser.parse_args()
@@ -334,6 +335,7 @@ if __name__ == '__main__':
     num_of_cores = int(args.nprocs)
     cfx_option = args.option
     input_file = args.inputs
+    other_file = args.otherfiles
     wtime = int(args.wtime)
     coretype_name = args.coretype
 
@@ -370,6 +372,10 @@ if __name__ == '__main__':
     res_file = ''
     uploaded_files = ''
 
+    other_files = other_file.split()
+    for i in range(len(other_files)):
+        input_files.append(other_files[i])
+
     for i in range(len(input_files)) :
         try:
             if os.path.splitext(input_files[i])[-1] == '.def' :
@@ -378,13 +384,14 @@ if __name__ == '__main__':
                 res_file = os.path.basename(input_files[i])
 
             with open(input_files[i], 'rb') as ifile:
-                def cb_print_status(monitor):
-                    sys.stdout.write('\r'+input_files[i]+' {:.2f}% uploaded ({} of {} bytes)'.format(
-                        100.0 * monitor.bytes_read / monitor.len, monitor.bytes_read, monitor.len))
-                    sys.stdout.flush()
+#                def cb_print_status(monitor):
+#                    sys.stdout.write('\r'+input_files[i]+' {:.2f}% uploaded ({} of {} bytes)'.format(
+#                        100.0 * monitor.bytes_read / monitor.len, monitor.bytes_read, monitor.len))
+#                    sys.stdout.flush()
 
                 encoder = MultipartEncoder(fields={'file': (ifile.name, ifile)})
-                monitor = MultipartEncoderMonitor(encoder, cb_print_status)
+#                monitor = MultipartEncoderMonitor(encoder, cb_print_status)
+                monitor = MultipartEncoderMonitor(encoder)
 
                 upload_file = requests.post(
                     upload_url,
@@ -392,16 +399,14 @@ if __name__ == '__main__':
                     headers={'Authorization' : my_token,'Content-Type': encoder.content_type})
 
                 if (upload_file.status_code == 201) :
-#                    print('\nInput file ' + input_files[i] + ' uploaded')
+                    print('- ' + input_files[i] + ' uploaded')
                     uploaded_files = uploaded_files + ' ' + os.path.basename(input_files[i])
                     upload_file_dict = json.loads(upload_file.text)
                     inputfile_id[i] = upload_file_dict['id']
                     inputfiles_list.append({'id':inputfile_id[i]})
                 else:
-                    print('\nInput file ' + input_files[i] + ' upload failed')
+                    print('-  ' + input_files[i] + ' upload failed')
                     exit(1)
-
-                print('\n')
 
         except FileNotFoundError as e:
             print (e) 
@@ -424,8 +429,9 @@ if __name__ == '__main__':
     zip_command = ''
     job_command = command + rm_command + zip_command
 
-    print('Job Information')
+    print('\nJob Information')
     print('- input_file : ' + input_file)
+    print('- other_file : ' + other_file)
     print('- code_name : ' + code_name)
     print('- version_code : ' + version_code)
     print('- coretype_name : ' + coretype_name)
@@ -492,6 +498,27 @@ if __name__ == '__main__':
 #                            'waiveSla' : True
 #                        },
                     'inputFiles' : inputfiles_list
+                },
+                {
+                    'useRescaleLicense' : False,
+                    'useMPI' : False,
+                    'command' : '', 
+                    'flags' : { 
+                        'igCv' : True,
+                        'runForever' : True
+                    },
+                    'analysis' : { 
+                        'code' : "rescale-ckpt-e2e",
+                        'version' : "rescale_ckpt_e2e_4H"
+                    },
+                    'hardware' : { 
+                        'coresPerSlot' : core_per_slot,
+                        'slots' : slot,
+                        'walltime' : wtime,
+                        'coreType' : coretype_code,
+                        'type' : 'interactive',
+                        },
+                    'inputFiles' : []
                 },
             ]
         },
@@ -576,6 +603,7 @@ if __name__ == '__main__':
                 if dcv_file_created == False :
                     pub_hostname = dcv_info(job_name)
                     dcv_file_created = True
+                    print('\nDCV connection file is created.')
 
                 # Live tail of CFX out
                 tail_file_url = rescale_platform + '/api/v2/jobs/' + job_id + '/runs/1/tail/shared/' + cfx_tail_out
@@ -613,12 +641,18 @@ if __name__ == '__main__':
                     instance_info_dict = json.loads(instance_info.text)
                     current_pub_hostname = instance_info_dict['results'][0]['publicHostname']
 
-                if (current_pub_hostname != pub_hostname) :
-                    print('Cluster is restarted')
-                    time.sleep(90)
-                    dcv_file_created = False
-                # Spot-kill handling : DCV session password is not changed after restart
+#                if (current_pub_hostname != pub_hostname) :
+#                    print('Cluster is restarted')
+#                    time.sleep(90)
+#                    dcv_file_created = False
 
+                if (current_pub_hostname != pub_hostname) :
+                    print('E2E cluster is restarted and shutdown')
+                    kill_job()
+                    exit (0) 
+
+                # Spot-kill handling : DCV session password is not changed after restart
+        
             # End of Live tail 
 
         if current_status == 'Completed':
