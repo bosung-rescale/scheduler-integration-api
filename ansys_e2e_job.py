@@ -593,6 +593,7 @@ if __name__ == '__main__':
                 if dcv_file_created == False :
                     pub_hostname = dcv_info(job_name)
                     dcv_file_created = True
+                    print('\nDCV connection file is created')
 
                 ## Live tail of
                 #tail_file_url = rescale_platform + '/api/v2/jobs/' + job_id + '/runs/1/tail/' + ansys_tail_out
