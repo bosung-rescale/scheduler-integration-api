@@ -398,7 +398,7 @@ if __name__ == '__main__':
                     inputfile_id[i] = upload_file_dict['id']
                     inputfiles_list.append({'id':inputfile_id[i],'decompress':False})
                 else:
-                    print('\nInput file ' + input_files[i] + ' upload failed')
+                    print('- ' + input_files[i] + ' upload failed')
                     exit(1)
 
         except FileNotFoundError as e:
