@@ -372,9 +372,12 @@ if __name__ == '__main__':
     res_file = ''
     uploaded_files = ''
 
-    other_files = other_file.split()
-    for i in range(len(other_files)):
-        input_files.append(other_files[i])
+    if (other_file != None):
+        other_files = other_file.split()
+        for i in range(len(other_files)):
+            input_files.append(other_files[i])
+    else:
+        other_file = ''
 
     for i in range(len(input_files)) :
         try:
