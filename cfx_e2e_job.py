@@ -421,12 +421,17 @@ if __name__ == '__main__':
 # job_command set
     if (res_file == '') :
 #        command = 'cfx5solve -def ' + def_file + ' -part ' + str(core_per_slot) + ' '+ cfx_option + ' \n'
-        command = 'cfx5solve -def ' + def_file + ' -part ' + str(num_of_cores) + ' '+ cfx_option + ' \n'
+        command = 'cfx5solve -def '+def_file+' -part '+str(num_of_cores)+' '+cfx_option+' \n'
+        rm_command = 'rm -f '+ uploaded_files + '\n'
     else :
-#        command = 'cfx5solve -def ' + def_file + ' -part ' + str(core_per_slot) + ' -initial-file ' + res_file + ' ' + cfx_option + ' \n'
-        command = 'cfx5solve -def ' + def_file + ' -part ' + str(num_of_cores) + ' -ini ' + res_file + ' ' + cfx_option + ' \n'
+        sed_command = 'cfx5cmds -read -def ' + def_file + ' -text ' + def_file + '.ccl\n' \
+                    + 'sed -i "s/=.*.' + res_file + '/= ' + res_file + '/" ' + def_file + '.ccl\n' \
+                    + 'cfx5cmds -write -def '+ def_file + ' -text ' + def_file + '.ccl\n'
 
-    rm_command = 'rm -f '+ uploaded_files + '\n'
+        command = sed_command \
+                + 'cfx5solve -def '+ def_file +' -part ' + str(core_per_slot) + ' -initial-file ' + res_file + ' ' + cfx_option + ' \n'
+        rm_command = 'rm -f '+ uploaded_files + ' ' + def_file+'.ccl\n'
+
 #    zip_command = 'zip -r -q ' + job_name + '_out.zip * -x process_output.log -x tmp/* \n' 
 #    zip_command = zip_command + 'find . -name "*.zip" -prune -o -name "*.log" -prune -o -exec rm -rf {} \;'
     zip_command = ''
@@ -447,7 +452,7 @@ if __name__ == '__main__':
 
     sys.stdout.flush()
     sys.stderr.flush()
-
+    
 # Job setup
 
     if version_code in ['16.0', '16.2', '16.2.1','17.1.0-pcmpi','17.2-pcmpi','18.0','18.1','18.2','19.0','19.1','19.2'] :
