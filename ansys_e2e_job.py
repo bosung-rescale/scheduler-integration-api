@@ -298,7 +298,7 @@ if __name__ == '__main__':
                          16.2.1 / 16.2 / 18.2 / 19.0 / 19.1 / 19.2 / 2019r1 / 2019r2 / 2019r3 / 2020r1 / 2020r2 / 2021r1')
 #    parser.add_argument('--option', '-o', required=False, default='', help='Ansys Option')
     parser.add_argument('--inputs', '-i', required=True, help='Input File Name')
-#    parser.add_argument('--journal', '-j', required=True, help='Journal File')
+    parser.add_argument('--otherfiles', '-of', required=False, help='Other File Names')
     parser.add_argument('--wtime', '-w', required=True, help='Max. Wall Time')
 
     args = parser.parse_args()
@@ -336,7 +336,7 @@ if __name__ == '__main__':
     num_of_cores = int(args.nprocs)
 #    ansys_option = args.option
     input_file = args.inputs
-#    journal_file = args.journal
+    other_file = args.otherfiles
     wtime = int(args.wtime)
     coretype_name = args.coretype
 
@@ -371,16 +371,21 @@ if __name__ == '__main__':
     inputfiles_list = []
     uploaded_files = ''
 
+    other_files = other_file.split()
+    for i in range(len(other_files)):
+        input_files.append(other_files[i])
+
     for i in range(len(input_files)) :
         try:
             with open(input_files[i], 'rb') as ifile:
-                def cb_print_status(monitor):
-                    sys.stdout.write('\r'+input_files[i]+' {:.2f}% uploaded ({} of {} bytes)'.format(
-                        100.0 * monitor.bytes_read / monitor.len, monitor.bytes_read, monitor.len))
-                    sys.stdout.flush()
+#                def cb_print_status(monitor):
+#                    sys.stdout.write('\r'+input_files[i]+' {:.2f}% uploaded ({} of {} bytes)'.format(
+#                        100.0 * monitor.bytes_read / monitor.len, monitor.bytes_read, monitor.len))
+#                    sys.stdout.flush()
 
                 encoder = MultipartEncoder(fields={'file': (ifile.name, ifile)})
-                monitor = MultipartEncoderMonitor(encoder, cb_print_status)
+#                monitor = MultipartEncoderMonitor(encoder, cb_print_status)
+                monitor = MultipartEncoderMonitor(encoder)
 
                 upload_file = requests.post(
                     upload_url,
@@ -388,16 +393,14 @@ if __name__ == '__main__':
                     headers={'Authorization' : my_token,'Content-Type': encoder.content_type})
 
                 if (upload_file.status_code == 201) :
-#                    print('\nInput file ' + input_files[i] + ' uploaded')
+                    print('- ' + input_files[i] + ' uploaded')
                     uploaded_files = uploaded_files + ' ' + os.path.basename(input_files[i])
                     upload_file_dict = json.loads(upload_file.text)
                     inputfile_id[i] = upload_file_dict['id']
                     inputfiles_list.append({'id':inputfile_id[i],'decompress':False})
                 else:
-                    print('\nInput file ' + input_files[i] + ' upload failed')
+                    print('- ' + input_files[i] + ' upload failed')
                     exit(1)
-
-                print('\n')
 
         except FileNotFoundError as e:
             print (e) 
@@ -408,16 +411,16 @@ if __name__ == '__main__':
 
 # job_command set
 #    command = 'export DISPLAY=:2:0 ; fluent 3ddp -g -ssh -cnf=$HOME/mpd.hosts -t'+ str(core_per_slot) + ' -i ' + journal_file +' -driver x11 \n'
-    rm_command = 'rm -f '+ uploaded_files + '\n'
+#    rm_command = 'rm -f '+ uploaded_files + '\n'
 #    zip_command = 'zip -r -q ' + job_name + '_out.zip * -x process_output.log -x tmp/* \n' 
 #    zip_command = zip_command + 'find . -name "*.zip" -prune -o -name "*.log" -prune -o -exec rm -rf {} \;'
 #    zip_command = ''
 #    job_command = command + rm_command + zip_command
-    job_command = rm_command
+    job_command = ''
 
-    print('Job Information')
+    print('\nJob Information')
     print('- input_file : ' + input_file)
-#    print('- journal_file : ' + journal_file)
+    print('- other_file : ' + other_file)
     print('- code_name : ' + code_name)
     print('- version_code : ' + version_code)
     print('- coretype_name : ' + coretype_name)
@@ -489,6 +492,27 @@ if __name__ == '__main__':
 #                            'waiveSla' : True
 #                        },  
                     'inputFiles' : inputfiles_list
+                },
+                {
+                    'useRescaleLicense' : False,
+                    'useMPI' : False,
+                    'command' : '',
+                    'flags' : { 
+                        'igCv' : True,
+                        'runForever' : True
+                    },
+                    'analysis' : {
+                        'code' : "rescale-ckpt-e2e",
+                        'version' : "rescale_ckpt_e2e_4H"
+                    },
+                    'hardware' : {
+                        'coresPerSlot' : core_per_slot,
+                        'slots' : slot,
+                        'walltime' : wtime,
+                        'coreType' : coretype_code,
+                        'type' : 'interactive',
+                        },
+                    'inputFiles' : []
                 },
             ] 
         },
