@@ -510,11 +510,7 @@ if __name__ == '__main__':
                 {
                     'useRescaleLicense' : False,
                     'useMPI' : False,
-                    'command' : '', 
-                    'flags' : { 
-                        'igCv' : True,
-                        'runForever' : True
-                    },
+                    'command' : '#', 
                     'analysis' : { 
                         'code' : "rescale-ckpt-e2e",
                         'version' : "rescale_ckpt_e2e_4H"

@@ -499,7 +499,7 @@ if __name__ == '__main__':
                 {
                     'useRescaleLicense' : False,
                     'useMPI' : False,
-                    'command' : '',
+                    'command' : '#',
                     'flags' : { 
                         'igCv' : True,
                         'runForever' : True
