@@ -1,4 +1,8 @@
 2021/08/30
+- In cfx_e2e_job.py, turn off 'Forever' option
+- In Ansys_e2e_job.py, turn on 'Forever' option
+
+2021/08/30
 - Add the -otherfile option for uploading addition files with input files
 - Add commands for handling the absolute CFX restart file path in the .def file
    example) 
