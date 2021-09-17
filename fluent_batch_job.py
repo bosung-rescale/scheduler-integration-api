@@ -294,7 +294,7 @@ if __name__ == '__main__':
     parser.add_argument('--coretype', '-c', required=False, default='Emerald', help='Coretype Name')
     parser.add_argument('--nprocs', '-np', required=True, help='Number of Cores')
     parser.add_argument('--ver', '-v', required=False, default='2020r1', help='Fluent Version, \
-                         16.0 / 16.2 / 16.2.1 / 17.1.0-pcmpi / 17.2-pcmpi / 18.0 / 18.1 / 18.2 / 19.0 / 19.1 / 19.2 / 2019r1 / 2019r2 / 2019r3 / 2020r1 / 2020r2 / 2021r1')
+                         16.0 / 16.2 / 16.2.1 / 17.1.0-pcmpi / 17.2-pcmpi / 18.0 / 18.1 / 18.2 / 19.0 / 19.1 / 19.2 / 2019r1 / 2019r2 / 2019r3 / 2020r1 / 2020r2 / 2021r1/ 2021r2')
     parser.add_argument('--option', '-o', required=False, default='', help='Fluent Option')
     parser.add_argument('--inputs', '-i', required=True, help='Input File Name')
     parser.add_argument('--journal', '-j', required=True, help='Journal File')

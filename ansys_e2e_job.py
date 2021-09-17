@@ -295,7 +295,7 @@ if __name__ == '__main__':
     parser.add_argument('--coretype', '-c', required=False, default='Emerald', help='Coretype Name')
     parser.add_argument('--nprocs', '-np', required=True, help='Number of Cores')
     parser.add_argument('--ver', '-v', required=False, default='2020r1', help='Ansys Version, \
-                         16.2.1 / 16.2 / 18.2 / 19.0 / 19.1 / 19.2 / 2019r1 / 2019r2 / 2019r3 / 2020r1 / 2020r2 / 2021r1')
+                         16.2.1 / 16.2 / 18.2 / 19.0 / 19.1 / 19.2 / 2019r1 / 2019r2 / 2019r3 / 2020r1 / 2020r2 / 2021r1 / 2021r2')
 #    parser.add_argument('--option', '-o', required=False, default='', help='Ansys Option')
     parser.add_argument('--inputs', '-i', required=True, help='Input File Name')
     parser.add_argument('--otherfiles', '-of', required=False, help='Other File Names')
